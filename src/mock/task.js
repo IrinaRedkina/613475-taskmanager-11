@@ -1,6 +1,13 @@
 import {COLORS} from "../const.js";
 import {getRandomNumber, getRandomElement} from '../util';
 
+const INITIAL_TASK = {
+  color: `black`,
+  description: ``,
+  dueDate: null,
+  repeatingDays: {}
+};
+
 const DescriptionItems = [
   `Изучить теорию`,
   `Сделать домашку`,
@@ -58,4 +65,4 @@ const generateTasks = (count) => {
     .map(generateTask);
 };
 
-export {generateTasks, generateTask};
+export {generateTasks, generateTask, INITIAL_TASK};

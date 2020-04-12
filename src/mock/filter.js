@@ -1,13 +1,11 @@
 const filterNames = [`all`, `overdue`, `today`, `favorites`, `repeating`, `archive`];
 
 const isToday = (date) => {
-  return new Date().getFullYear() === date.getFullYear() &&
-    new Date().getMonth() === date.getMonth() &&
-    new Date().getDate() === date.getDate() ? true : false;
+  const todayDate = new Date();
+  return date.toDateString() === todayDate.toDateString() ? true : false;
 };
 
 const getFilterCounts = (tasks) => {
-
   const counts = {
     'all': tasks.length,
     'overdue': 0,

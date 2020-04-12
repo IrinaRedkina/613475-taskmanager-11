@@ -1,5 +1,6 @@
 import {COLORS, DAYS, MONTH_NAMES} from "../const.js";
 import {formatTime} from "../util.js";
+import {INITIAL_TASK} from "../mock/task";
 
 const createColorMarkup = (color, isChecked) => {
   return (
@@ -35,17 +36,7 @@ const createRepeatingDayMarkup = (day, isChecked) => {
   );
 };
 
-const createEditTaskTemplate = (task) => {
-
-  if (!task) {
-    task = {
-      color: `black`,
-      description: ``,
-      dueDate: null,
-      repeatingDays: {}
-    };
-  }
-
+const createEditTaskTemplate = (task = INITIAL_TASK) => {
   const {color, description, dueDate, repeatingDays} = task;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
