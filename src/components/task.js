@@ -1,5 +1,5 @@
 import {MONTH_NAMES} from "../const.js";
-import {formatTime} from "../util.js";
+import {formatTime, createElement} from "../util.js";
 
 const createTaskControlMarkup = (isArchive, isFavorite, buttonDisabledClass) => {
   return (
@@ -69,4 +69,25 @@ const createTaskTemplate = (task) => {
   );
 };
 
-export {createTaskTemplate};
+export default class TaskComponent {
+  constructor(task) {
+    this._task = task;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTaskTemplate(this._task);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
