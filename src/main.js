@@ -17,7 +17,7 @@ const SHOWING_TASKS_COUNT_ON_START = 8;
 const SHOWING_TASKS_COUNT_BY_BUTTON = 8;
 
 
-const renderTask = (taskListElement, task) => {
+const renderTask = (taskListElement, task, idTask) => {
   const replaceTaskToEdit = () => {
     taskListElement.replaceChild(taskEditElement, taskElement);
   };
@@ -35,9 +35,9 @@ const renderTask = (taskListElement, task) => {
     }
   };
 
-  const taskComponent = new TaskComponent(task);
+  const taskComponent = new TaskComponent(idTask, task);
   const taskElement = taskComponent.getElement();
-  const taskEditComponent = new EditTaskComponent(task);
+  const taskEditComponent = new EditTaskComponent(idTask, task);
   const taskEditElement = taskEditComponent.getElement();
 
   const editButton = taskElement.querySelector(`.card__btn--edit`);
@@ -60,8 +60,9 @@ const renderTask = (taskListElement, task) => {
 const renderBoard = (boardComponent, tasks) => {
   const boardElement = boardComponent.getElement();
   const isAllTasksArchived = tasks.every((task) => task.isArchive);
+  const isNoTasks = tasks.length === 0;
 
-  if (isAllTasksArchived) {
+  if (isAllTasksArchived || isNoTasks) {
     render(boardElement, new NoTasksComponent().getElement());
     return;
   }
@@ -69,12 +70,12 @@ const renderBoard = (boardComponent, tasks) => {
   render(boardElement, new SortingComponent().getElement());
   render(boardElement, new TasksComponent().getElement());
 
+  const taskListElement = boardElement.querySelector(`.board__tasks`);
+
   const renderTasks = (startTask, endTask) => {
     tasks.slice(startTask, endTask)
-      .forEach((task) => renderTask(taskListElement, task));
+      .forEach((task, i) => renderTask(taskListElement, task, i));
   };
-
-  const taskListElement = boardElement.querySelector(`.board__tasks`);
 
   let showingTasksCount = SHOWING_TASKS_COUNT_ON_START;
   renderTasks(0, showingTasksCount);
