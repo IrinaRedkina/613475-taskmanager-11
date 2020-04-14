@@ -1,16 +1,19 @@
 import {createMenuTemplate} from './components/menu.js';
 import {createBoardTemplate} from './components/board.js';
+import {createSortingTemplate} from './components/sorting.js';
 
-import {createFilterTemplate} from './components/filter.js';
 import {generateFilters} from './mock/filter';
+import {createFilterTemplate} from './components/filter.js';
 
-import {createEditTaskTemplate} from './components/edit-task.js';
-import {createTaskTemplate} from './components/task.js';
 import {generateTasks} from './mock/task.js';
+import {createTasksTemplate} from './components/tasks.js';
+import {createTaskTemplate} from './components/task.js';
+import {createEditTaskTemplate} from './components/edit-task.js';
+import {createNoTasksTemplate} from './components/no-tasks.js';
 
 import {createLoadMoreButtonTemplate} from './components/load-more-button.js';
 
-const TASK_COUNT = 22;
+const TASK_COUNT = 20;
 const SHOWING_TASKS_COUNT_ON_START = 8;
 const SHOWING_TASKS_COUNT_BY_BUTTON = 8;
 
@@ -23,7 +26,7 @@ const renderElement = (container, template, place = `beforeEnd`) => {
 
 const renderTasks = (startTask, endTask) => {
   tasks.slice(startTask, endTask)
-  .forEach((task) => renderElement(boardListElement, createTaskTemplate(task)));
+  .forEach((task) => renderElement(taskList, createTaskTemplate(task)));
 };
 
 const siteMainContainer = document.querySelector(`.main`);
@@ -34,11 +37,14 @@ renderElement(siteMainContainer, createFilterTemplate(filters));
 renderElement(siteMainContainer, createBoardTemplate());
 
 const boardElement = siteMainContainer.querySelector(`.board`);
-const boardListElement = boardElement.querySelector(`.board__tasks`);
+renderElement(boardElement, createSortingTemplate());
+renderElement(boardElement, createTasksTemplate());
+
+const taskList = boardElement.querySelector(`.board__tasks`);
 
 let showingTasksCount = SHOWING_TASKS_COUNT_ON_START;
 
-renderElement(boardListElement, createEditTaskTemplate(tasks[0]));
+renderElement(taskList, createEditTaskTemplate(tasks[0]));
 
 renderTasks(1, showingTasksCount);
 
