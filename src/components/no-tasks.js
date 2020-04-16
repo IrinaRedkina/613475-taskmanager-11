@@ -1,18 +1,20 @@
 import {createElement} from "../util.js";
 
-const createBoardTemplate = () => {
+const createNoTasksTemplate = () => {
   return (
-    `<section class="board container"></section>`
+    `<p class="board__no-tasks">
+      Click «ADD NEW TASK» in menu to create your first task
+    </p>`
   );
 };
 
-export default class BoardComponent {
+export default class NoTasksComponent {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createBoardTemplate();
+    return createNoTasksTemplate();
   }
 
   getElement() {
@@ -27,4 +29,3 @@ export default class BoardComponent {
     this._element = null;
   }
 }
-
