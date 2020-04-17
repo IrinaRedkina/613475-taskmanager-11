@@ -2,41 +2,41 @@ import {COLORS, DAYS, MONTH_NAMES} from "../const.js";
 import {formatTime, createElement} from "../util.js";
 import {INITIAL_TASK} from "../mock/task";
 
-const createColorMarkup = (color, isChecked) => {
+const createColorMarkup = (color, isChecked, idTask) => {
   return (
     `<input
       type="radio"
-      id="color-${color}-4"
+      id="color-${color}-${idTask}"
       class="card__color-input card__color-input--${color} visually-hidden"
       name="color"
       value="${color}"
       ${isChecked ? `checked` : ``}
     />
     <label
-      for="color-${color}-4"
+      for="color-${color}-${idTask}"
       class="card__color card__color--${color}"
       >${color}</label
     >`
   );
 };
 
-const createRepeatingDayMarkup = (day, isChecked) => {
+const createRepeatingDayMarkup = (day, isChecked, idTask) => {
   return (
     `<input
       class="visually-hidden card__repeat-day-input"
       type="checkbox"
-      id="repeat-${day}-4"
+      id="repeat-${day}-${idTask}"
       name="repeat"
       value="${day}"
       ${isChecked ? `checked` : ``}
     />
-    <label class="card__repeat-day" for="repeat-${day}-4"
+    <label class="card__repeat-day" for="repeat-${day}-${idTask}"
       >${day}</label
     >`
   );
 };
 
-const createEditTaskTemplate = (task = INITIAL_TASK) => {
+const createEditTaskTemplate = (idTask, task = INITIAL_TASK) => {
   const {color, description, dueDate, repeatingDays} = task;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
@@ -48,11 +48,11 @@ const createEditTaskTemplate = (task = INITIAL_TASK) => {
   const isRepeatingTask = Object.values(repeatingDays).some(Boolean);
   const repeatClass = isRepeatingTask ? `card--repeat` : ``;
 
-  const colorsMarkup = COLORS.map((item) => createColorMarkup(item, item === color)).join(`\n`);
-  const repeatingDaysMarkup = DAYS.map((item) => createRepeatingDayMarkup(item, repeatingDays[item])).join(`\n`);
+  const colorsMarkup = COLORS.map((item) => createColorMarkup(item, item === color, idTask)).join(`\n`);
+  const repeatingDaysMarkup = DAYS.map((item) => createRepeatingDayMarkup(item, repeatingDays[item], idTask)).join(`\n`);
 
   return (
-    `<article class="card card--edit card--${color} ${repeatClass} ${deadlineClass}">
+    `<article data-id="${idTask}" class="card card--edit card--${color} ${repeatClass} ${deadlineClass}">
       <form class="card__form" method="get">
         <div class="card__inner">
           <div class="card__color-bar">
@@ -122,13 +122,14 @@ const createEditTaskTemplate = (task = INITIAL_TASK) => {
 };
 
 export default class EditTaskComponent {
-  constructor(task) {
+  constructor(id, task) {
+    this._id = id;
     this._task = task;
     this._element = null;
   }
 
   getTemplate() {
-    return createEditTaskTemplate(this._task);
+    return createEditTaskTemplate(this._id, this._task);
   }
 
   getElement() {

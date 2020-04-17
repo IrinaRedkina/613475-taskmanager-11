@@ -19,7 +19,7 @@ const createTaskControlMarkup = (isArchive, isFavorite, buttonDisabledClass) => 
   );
 };
 
-const createTaskTemplate = (task) => {
+const createTaskTemplate = (idTask, task) => {
   const {color, description, dueDate, repeatingDays, isArchive, isFavorite} = task;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
@@ -34,7 +34,7 @@ const createTaskTemplate = (task) => {
   const buttonDisabledClass = `card__btn--disabled`;
 
   return (
-    `<article class="card card--${color} ${repeatClass} ${deadlineClass}">
+    `<article data-id="${idTask}" class="card card--${color} ${repeatClass} ${deadlineClass}">
       <div class="card__form">
         <div class="card__inner">
           ${createTaskControlMarkup(isArchive, isFavorite, buttonDisabledClass)}
@@ -70,13 +70,14 @@ const createTaskTemplate = (task) => {
 };
 
 export default class TaskComponent {
-  constructor(task) {
+  constructor(id, task) {
+    this._id = id;
     this._task = task;
     this._element = null;
   }
 
   getTemplate() {
-    return createTaskTemplate(this._task);
+    return createTaskTemplate(this._id, this._task);
   }
 
   getElement() {
