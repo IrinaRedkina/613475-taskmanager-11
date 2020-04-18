@@ -1,6 +1,7 @@
 import {COLORS, DAYS, MONTH_NAMES} from "../const.js";
-import {formatTime, createElement} from "../util.js";
+import {formatTime} from "../utils/common";
 import {INITIAL_TASK} from "../mock/task";
+import AbstractComponent from "./abstract-component";
 
 const createColorMarkup = (color, isChecked, idTask) => {
   return (
@@ -121,26 +122,15 @@ const createEditTaskTemplate = (idTask, task = INITIAL_TASK) => {
   );
 };
 
-export default class EditTaskComponent {
+export default class EditTask extends AbstractComponent {
   constructor(id, task) {
+    super();
+
     this._id = id;
     this._task = task;
-    this._element = null;
   }
 
   getTemplate() {
     return createEditTaskTemplate(this._id, this._task);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

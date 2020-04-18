@@ -1,21 +1,20 @@
-import MenuComponent from './components/menu';
-import FilterComponent from './components/filter';
-import SortingComponent from './components/sorting';
-import BoardComponent from './components/board';
-import LoadMoreButtonComponent from './components/load-more-button';
-import TasksComponent from './components/tasks';
-import TaskComponent from './components/task';
-import EditTaskComponent from './components/edit-task';
-import NoTasksComponent from './components/no-tasks';
+import Menu from './components/menu';
+import Filter from './components/filter';
+import Sorting from './components/sorting';
+import Board from './components/board';
+import LoadMoreButton from './components/load-more-button';
+import Tasks from './components/tasks';
+import Task from './components/task';
+import EditTask from './components/edit-task';
+import NoTasks from './components/no-tasks';
 import {generateTasks} from './mock/task';
 import {generateFilters} from './mock/filter';
-import {render, Key} from './util';
-
+import {render} from './utils/render';
+import {Key} from './utils/common';
 
 const TASK_COUNT = 20;
 const SHOWING_TASKS_COUNT_ON_START = 8;
 const SHOWING_TASKS_COUNT_BY_BUTTON = 8;
-
 
 const renderTask = (taskListElement, task, idTask) => {
   const replaceTaskToEdit = () => {
@@ -35,9 +34,9 @@ const renderTask = (taskListElement, task, idTask) => {
     }
   };
 
-  const taskComponent = new TaskComponent(idTask, task);
+  const taskComponent = new Task(idTask, task);
   const taskElement = taskComponent.getElement();
-  const taskEditComponent = new EditTaskComponent(idTask, task);
+  const taskEditComponent = new EditTask(idTask, task);
   const taskEditElement = taskEditComponent.getElement();
 
   const editButton = taskElement.querySelector(`.card__btn--edit`);
@@ -63,12 +62,12 @@ const renderBoard = (boardComponent, tasks) => {
   const isNoTasks = tasks.length === 0;
 
   if (isAllTasksArchived || isNoTasks) {
-    render(boardElement, new NoTasksComponent().getElement());
+    render(boardElement, new NoTasks().getElement());
     return;
   }
 
-  render(boardElement, new SortingComponent().getElement());
-  render(boardElement, new TasksComponent().getElement());
+  render(boardElement, new Sorting().getElement());
+  render(boardElement, new Tasks().getElement());
 
   const taskListElement = boardElement.querySelector(`.board__tasks`);
 
@@ -80,7 +79,7 @@ const renderBoard = (boardComponent, tasks) => {
   let showingTasksCount = SHOWING_TASKS_COUNT_ON_START;
   renderTasks(0, showingTasksCount);
 
-  const loadMoreButtonComponent = new LoadMoreButtonComponent();
+  const loadMoreButtonComponent = new LoadMoreButton();
   const loadMoreButtonElement = loadMoreButtonComponent.getElement();
   const isShowingLoadMoreButton = showingTasksCount < tasks.length;
 
@@ -110,9 +109,9 @@ const filters = generateFilters(tasks);
 const siteMainElement = document.querySelector(`.main`);
 const siteHeaderElement = siteMainElement.querySelector(`.main__control`);
 
-render(siteHeaderElement, new MenuComponent().getElement());
-render(siteMainElement, new FilterComponent(filters).getElement());
+render(siteHeaderElement, new Menu().getElement());
+render(siteMainElement, new Filter(filters).getElement());
 
-const boardComponent = new BoardComponent();
+const boardComponent = new Board();
 render(siteMainElement, boardComponent.getElement());
 renderBoard(boardComponent, tasks);
