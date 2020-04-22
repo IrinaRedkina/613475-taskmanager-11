@@ -13,19 +13,11 @@ const SHOWING_TASKS_COUNT_BY_BUTTON = 8;
 
 
 const renderTask = (taskListElement, task, idTask) => {
-  const replaceTaskToEdit = () => {
-    replace(taskEditComponent, taskComponent);
-  };
-
-  const replaceEditToTask = () => {
-    replace(taskComponent, taskEditComponent);
-  };
-
   const onEscKeyDown = (evt) => {
     const isEscKey = evt.key === Key.ESC || evt.key === Key.ESC_SHORT;
 
     if (isEscKey) {
-      replaceEditToTask();
+      replace(taskComponent, taskEditComponent);
       document.removeEventListener(`keydown`, onEscKeyDown);
     }
   };
@@ -34,13 +26,13 @@ const renderTask = (taskListElement, task, idTask) => {
   const taskEditComponent = new EditTaskComponent(idTask, task);
 
   taskComponent.setEditButtonClickHandler(() => {
-    replaceTaskToEdit();
+    replace(taskEditComponent, taskComponent);
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
   taskEditComponent.setEditFormSubmitHandler((evt) => {
     evt.preventDefault();
-    replaceEditToTask();
+    replace(taskComponent, taskEditComponent);
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
 
