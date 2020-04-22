@@ -1,5 +1,5 @@
 import {COLORS} from "../const.js";
-import {getRandomNumber, getRandomElement} from '../util';
+import {getRandomNumber, getRandomElement} from '../utils/common';
 
 const INITIAL_TASK = {
   color: `black`,
