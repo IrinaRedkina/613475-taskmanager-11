@@ -1,13 +1,6 @@
 import {COLORS} from "../const.js";
 import {getRandomNumber, getRandomElement} from '../utils/common';
 
-const INITIAL_TASK = {
-  color: `black`,
-  description: ``,
-  dueDate: null,
-  repeatingDays: {}
-};
-
 const DescriptionItems = [
   `Изучить теорию`,
   `Сделать домашку`,
@@ -50,6 +43,7 @@ const generateTask = () => {
   const dueDate = Math.random() > 0.5 ? null : getRandomDate();
 
   return {
+    id: Date.now(),
     color: getRandomElement(COLORS),
     description: getRandomElement(DescriptionItems),
     dueDate,
@@ -65,4 +59,4 @@ const generateTasks = (count) => {
     .map(generateTask);
 };
 
-export {generateTasks, generateTask, INITIAL_TASK};
+export {generateTasks, generateTask};
