@@ -6,7 +6,7 @@ import {Key} from '../utils/common';
 const Mode = {
   DEFAULT: `default`,
   EDIT: `edit`
-}
+};
 
 export default class TaskController {
   constructor(container, onDataChange, onViewChange) {
