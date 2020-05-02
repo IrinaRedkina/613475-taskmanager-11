@@ -1,6 +1,9 @@
-import {COLORS, DAYS, MONTH_NAMES} from "../const.js";
-import {formatTime} from "../utils/common";
+import {COLORS, DAYS} from "../const.js";
+import {formatTime, formatDate} from "../utils/common";
 import AbstractSmartComponent from "./abstract-smart-component";
+
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
 
 const MIN_DESCRIPTION_LENGTH = 1;
 const MAX_DESCRIPTION_LENGTH = 140;
@@ -51,8 +54,8 @@ const createEditTaskTemplate = (task, options = {}) => {
   const {activeColor, activeRepeatingDays, currentDescription, isDateShowing, isRepeatingTask} = options;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
-  const date = dueDate ? `${dueDate.getDate()} ${MONTH_NAMES[dueDate.getMonth()]}` : ``;
-  const time = dueDate ? `${formatTime(dueDate)}` : ``;
+  const date = isDateShowing && dueDate ? formatDate(dueDate) : ``;
+  const time = isDateShowing && dueDate ? formatTime(dueDate) : ``;
 
   const deadlineClass = isExpired && isDateShowing ? `card--deadline` : ``;
   const repeatClass = isRepeatingTask ? `card--repeat` : ``;
@@ -151,8 +154,11 @@ export default class EditTask extends AbstractSmartComponent {
     this._currentDescription = task.description;
     this._currentColor = task.color;
 
+    this._flatpickr = null;
+
     this._submitHandler = null;
 
+    // this.applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -183,11 +189,34 @@ export default class EditTask extends AbstractSmartComponent {
     this._subscribeOnEvents();
   }
 
+  rerender() {
+    super.rerender();
+
+    this.applyFlatpickr();
+  }
+
   setSubmitHandler(handler) {
     this.getElement().querySelector(`form`)
       .addEventListener(`submit`, handler);
 
     this._submitHandler = handler;
+  }
+
+  applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    if (this._isDateShowing) {
+      const dateElement = this.getElement().querySelector(`.card__date`);
+
+      this._flatpickr = flatpickr(dateElement, {
+        altInput: true,
+        allowInput: true,
+        defaultDate: this._task.dueDate || `today`
+      });
+    }
   }
 
   _subscribeOnEvents() {

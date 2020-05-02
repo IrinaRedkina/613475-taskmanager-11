@@ -1,5 +1,4 @@
-import {MONTH_NAMES} from "../const.js";
-import {formatTime} from "../utils/common";
+import {formatTime, formatDate} from "../utils/common";
 import AbstractComponent from "./abstract-component";
 
 const createTaskControlMarkup = (isArchive, isFavorite, buttonDisabledClass) => {
@@ -26,8 +25,8 @@ const createTaskTemplate = (task, idTask = 2) => {
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
   const isDateShowing = !!dueDate;
   const deadlineClass = isExpired ? `card--deadline` : ``;
-  const date = isDateShowing ? `${dueDate.getDate()} ${MONTH_NAMES[dueDate.getMonth()]}` : ``;
-  const time = isDateShowing ? `${formatTime(dueDate)}` : ``;
+  const date = isDateShowing ? formatDate(dueDate) : ``;
+  const time = isDateShowing ? formatTime(dueDate) : ``;
 
   const isRepeatingTask = Object.values(repeatingDays).some(Boolean);
   const repeatClass = isRepeatingTask ? `card--repeat` : ``;

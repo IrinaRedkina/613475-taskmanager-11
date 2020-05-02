@@ -68,6 +68,8 @@ export default class TaskController {
   _replaceTaskToEdit() {
     this._onViewChange();
 
+    this._taskEditComponent.applyFlatpickr();
+
     replace(this._taskEditComponent, this._taskComponent);
     document.addEventListener(`keydown`, this._onEscKeyDown);
 
