@@ -20,7 +20,7 @@ const createTaskControlMarkup = (isArchive, isFavorite, buttonDisabledClass) => 
   );
 };
 
-const createTaskTemplate = (idTask, task) => {
+const createTaskTemplate = (task, idTask = 2) => {
   const {color, description, dueDate, repeatingDays, isArchive, isFavorite} = task;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
@@ -71,18 +71,25 @@ const createTaskTemplate = (idTask, task) => {
 };
 
 export default class Task extends AbstractComponent {
-  constructor(id, task) {
+  constructor(task) {
     super();
 
-    this._id = id;
     this._task = task;
   }
 
   getTemplate() {
-    return createTaskTemplate(this._id, this._task);
+    return createTaskTemplate(this._task);
   }
 
   setEditButtonClickHandler(handler) {
     this.getElement().querySelector(`.card__btn--edit`).addEventListener(`click`, handler);
+  }
+
+  setFavoriteClickHandler(handler) {
+    this.getElement().querySelector(`.card__btn--favorites`).addEventListener(`click`, handler);
+  }
+
+  setArchiveClickHandler(handler) {
+    this.getElement().querySelector(`.card__btn--archive`).addEventListener(`click`, handler);
   }
 }

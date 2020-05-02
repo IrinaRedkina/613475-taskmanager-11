@@ -29,6 +29,10 @@ export default class Sorting extends AbstractComponent {
     return createSortingTemplate();
   }
 
+  getSortType() {
+    return this._currenSortType;
+  }
+
   setSortTypeChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
       evt.preventDefault();
