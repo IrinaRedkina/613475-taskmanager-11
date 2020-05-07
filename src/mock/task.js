@@ -43,7 +43,7 @@ const generateTask = () => {
   const dueDate = Math.random() > 0.5 ? null : getRandomDate();
 
   return {
-    id: Date.now(),
+    id: String(Date.now()) + Math.random(),
     color: getRandomElement(COLORS),
     description: getRandomElement(DescriptionItems),
     dueDate,
