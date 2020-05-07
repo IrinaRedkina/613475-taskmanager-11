@@ -1,7 +1,7 @@
 import {COLORS, DAYS} from "../const.js";
-import {formatTime, formatDate} from "../utils/common";
+import {formatTime, formatDate, isRepeating, isOverdueDate} from "../utils/common";
 import AbstractSmartComponent from "./abstract-smart-component";
-
+import {encode} from "he";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 
@@ -53,9 +53,11 @@ const createEditTaskTemplate = (task, options = {}) => {
   const {id, dueDate} = task;
   const {activeColor, activeRepeatingDays, currentDescription, isDateShowing, isRepeatingTask} = options;
 
-  const isExpired = dueDate instanceof Date && dueDate < Date.now();
+  const isExpired = dueDate instanceof Date && isOverdueDate(dueDate, new Date());
   const date = isDateShowing && dueDate ? formatDate(dueDate) : ``;
   const time = isDateShowing && dueDate ? formatTime(dueDate) : ``;
+
+  const description = encode(currentDescription);
 
   const deadlineClass = isExpired && isDateShowing ? `card--deadline` : ``;
   const repeatClass = isRepeatingTask ? `card--repeat` : ``;
@@ -89,7 +91,7 @@ const createEditTaskTemplate = (task, options = {}) => {
                 class="card__text"
                 placeholder="Start typing your text here..."
                 name="text"
-              >${currentDescription}</textarea>
+              >${description}</textarea>
             </label>
           </div>
 
@@ -143,13 +145,32 @@ const createEditTaskTemplate = (task, options = {}) => {
   );
 };
 
+const parseFormData = (formData) => {
+  const repeatingDays = DAYS.reduce((acc, day) => {
+    acc[day] = false;
+    return acc;
+  }, {});
+
+  const date = formData.get(`date`);
+
+  return {
+    description: formData.get(`text`),
+    color: formData.get(`color`),
+    dueDate: date ? new Date(date) : null,
+    repeatingDays: formData.getAll(`repeat`).reduce((acc, it) => {
+      acc[it] = true;
+      return acc;
+    }, repeatingDays)
+  };
+};
+
 export default class EditTask extends AbstractSmartComponent {
   constructor(task) {
     super();
 
     this._task = task;
     this._isDateShowing = !!task.dueDate;
-    this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
+    this._isRepeatingTask = isRepeating(task.repeatingDays);
     this._activeRepeatingDays = Object.assign({}, task.repeatingDays);
     this._currentDescription = task.description;
     this._currentColor = task.color;
@@ -157,8 +178,8 @@ export default class EditTask extends AbstractSmartComponent {
     this._flatpickr = null;
 
     this._submitHandler = null;
+    this._deleteButtonClickHandler = null;
 
-    // this.applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -172,11 +193,20 @@ export default class EditTask extends AbstractSmartComponent {
     });
   }
 
+  removeElement() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    super.removeElement();
+  }
+
   reset() {
     const task = this._task;
 
     this._isDateShowing = !!task.dueDate;
-    this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
+    this._isRepeatingTask = isRepeating(task.repeatingDays);
     this._activeRepeatingDays = Object.assign({}, task.repeatingDays);
     this._currentDescription = task.description;
     this._currentColor = task.color;
@@ -184,8 +214,16 @@ export default class EditTask extends AbstractSmartComponent {
     this.rerender();
   }
 
+  getData() {
+    const form = this.getElement().querySelector(`.card__form`);
+    const formData = new FormData(form);
+
+    return parseFormData(formData);
+  }
+
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -200,6 +238,13 @@ export default class EditTask extends AbstractSmartComponent {
       .addEventListener(`submit`, handler);
 
     this._submitHandler = handler;
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.card__delete`)
+      .addEventListener(`click`, handler);
+
+    this._deleteButtonClickHandler = handler;
   }
 
   applyFlatpickr() {

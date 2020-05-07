@@ -1,5 +1,6 @@
-import {formatTime, formatDate} from "../utils/common";
+import {formatTime, formatDate, isOverdueDate, isRepeating} from "../utils/common";
 import AbstractComponent from "./abstract-component";
+import {encode} from "he";
 
 const createTaskControlMarkup = (isArchive, isFavorite, buttonDisabledClass) => {
   return (
@@ -20,18 +21,18 @@ const createTaskControlMarkup = (isArchive, isFavorite, buttonDisabledClass) => 
 };
 
 const createTaskTemplate = (task, idTask = 2) => {
-  const {color, description, dueDate, repeatingDays, isArchive, isFavorite} = task;
+  const {description: notSanitizedDescription, color, dueDate, repeatingDays, isArchive, isFavorite} = task;
 
-  const isExpired = dueDate instanceof Date && dueDate < Date.now();
+  const isExpired = dueDate instanceof Date && isOverdueDate(dueDate, new Date());
   const isDateShowing = !!dueDate;
   const deadlineClass = isExpired ? `card--deadline` : ``;
   const date = isDateShowing ? formatDate(dueDate) : ``;
   const time = isDateShowing ? formatTime(dueDate) : ``;
 
-  const isRepeatingTask = Object.values(repeatingDays).some(Boolean);
-  const repeatClass = isRepeatingTask ? `card--repeat` : ``;
-
+  const repeatClass = isRepeating(repeatingDays) ? `card--repeat` : ``;
   const buttonDisabledClass = `card__btn--disabled`;
+
+  const description = encode(notSanitizedDescription);
 
   return (
     `<article data-id="${idTask}" class="card card--${color} ${repeatClass} ${deadlineClass}">
