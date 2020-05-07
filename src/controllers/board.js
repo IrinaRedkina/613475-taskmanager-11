@@ -41,6 +41,7 @@ const renderTasks = (container, tasks, onDataChange, onViewChange) => {
 
 export default class BoardController {
   constructor(component, tasksModel) {
+    this._component = component;
     this._container = component.getElement();
     this._tasksModel = tasksModel;
 
@@ -61,6 +62,14 @@ export default class BoardController {
 
     this._sortingComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._tasksModel.setFilterChangeHandler(this._onFilterChange);
+  }
+
+  hide() {
+    this._component.hide();
+  }
+
+  show() {
+    this._component.show();
   }
 
   render() {
