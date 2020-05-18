@@ -5,6 +5,8 @@ import {replace, render, remove, RenderPosition} from '../utils/render';
 import {Key} from '../utils/common';
 import {color, DAYS} from '../const.js';
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 export const Mode = {
   ADDING: `adding`,
   DEFAULT: `default`,
@@ -77,10 +79,20 @@ export default class TaskController {
       const formData = this._taskEditComponent.getData();
       const data = parseFormData(formData);
 
+      this._taskEditComponent.setData({
+        saveButtonText: `Saving...`,
+      });
+
       this._onDataChange(this, task, data);
     });
 
-    this._taskEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, task, null));
+    this._taskEditComponent.setDeleteButtonClickHandler(() => {
+      this._taskEditComponent.setData({
+        deleteButtonText: `Deleting...`,
+      });
+
+      this._onDataChange(this, task, null);
+    });
 
     this._taskComponent.setFavoriteClickHandler(() => {
       const newTask = TaskModel.clone(task);
@@ -157,5 +169,26 @@ export default class TaskController {
       this._taskEditComponent.reset();
       this._replaceEditToTask();
     }
+  }
+
+  shake() {
+    this._taskEditComponent.getCardElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._taskComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    this._taskEditComponent.getCardElement().style.boxShadow = `0 0 5px red`;
+    this._taskComponent.getElement().style.boxShadow = `0 0 25px red`;
+
+    setTimeout(() => {
+      this._taskEditComponent.getCardElement().style.animation = ``;
+      this._taskComponent.getElement().style.animation = ``;
+
+      this._taskComponent.getElement().style.boxShadow = ``;
+      this._taskEditComponent.getCardElement().style.boxShadow = ``;
+
+      this._taskEditComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 }
