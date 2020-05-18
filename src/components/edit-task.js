@@ -8,6 +8,11 @@ import "flatpickr/dist/flatpickr.min.css";
 const MIN_DESCRIPTION_LENGTH = 1;
 const MAX_DESCRIPTION_LENGTH = 140;
 
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`,
+};
+
 const isAllowableDescriptionLength = (description) => {
   const length = description.length;
 
@@ -51,7 +56,7 @@ const createRepeatingDayMarkup = (day, isChecked, index) => {
 
 const createEditTaskTemplate = (task, options = {}) => {
   const {id, dueDate} = task;
-  const {activeColor, activeRepeatingDays, currentDescription, isDateShowing, isRepeatingTask} = options;
+  const {activeColor, activeRepeatingDays, currentDescription, isDateShowing, isRepeatingTask, externalData} = options;
 
   const isExpired = dueDate instanceof Date && isOverdueDate(dueDate, new Date());
   const date = isDateShowing && dueDate ? formatDate(dueDate) : ``;
@@ -70,7 +75,12 @@ const createEditTaskTemplate = (task, options = {}) => {
     return createRepeatingDayMarkup(item, activeRepeatingDays[item], i);
   }).join(`\n`);
 
-  const isDisabledSaveButton = isRepeatingTask && !Object.values(activeRepeatingDays).some(Boolean);
+  const isBlockSaveButton = (isDateShowing && isRepeatingTask) ||
+    (isRepeatingTask && !isRepeating(activeRepeatingDays)) ||
+    !isAllowableDescriptionLength(description);
+
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtonText = externalData.saveButtonText;
 
   return (
     `<article data-id="${id}" class="card card--edit card--${activeColor} ${repeatClass} ${deadlineClass}">
@@ -135,8 +145,8 @@ const createEditTaskTemplate = (task, options = {}) => {
           </div>
 
           <div class="card__status-btns">
-            <button class="card__save" type="submit" ${isDisabledSaveButton ? `disabled` : ``}>save</button>
-            <button class="card__delete" type="button">delete</button>
+          <button class="card__save" type="submit" ${isBlockSaveButton ? `disabled` : ``}>${saveButtonText}</button>
+          <button class="card__delete" type="button">${deleteButtonText}</button>
           </div>
 
         </div>
@@ -155,6 +165,7 @@ export default class EditTask extends AbstractSmartComponent {
     this._activeRepeatingDays = Object.assign({}, task.repeatingDays);
     this._currentDescription = task.description;
     this._currentColor = task.color;
+    this._externalData = DefaultData;
 
     this._flatpickr = null;
 
@@ -170,8 +181,13 @@ export default class EditTask extends AbstractSmartComponent {
       isRepeatingTask: this._isRepeatingTask,
       activeRepeatingDays: this._activeRepeatingDays,
       currentDescription: this._currentDescription,
-      activeColor: this._currentColor
+      activeColor: this._currentColor,
+      externalData: this._externalData
     });
+  }
+
+  getCardElement() {
+    return this.getElement().querySelector(`.card__inner`);
   }
 
   removeElement() {
@@ -198,6 +214,11 @@ export default class EditTask extends AbstractSmartComponent {
   getData() {
     const form = this.getElement().querySelector(`.card__form`);
     return new FormData(form);
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
   }
 
   recoveryListeners() {
